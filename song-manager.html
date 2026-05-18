@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Canciones</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #8B5CF6;
+            --primary-dark: #7C3AED;
+            --secondary: #EC4899;
+            --success: #10B981;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+            --bg-light: #FFFFFF;
+            --bg-light-alt: #F9FAFB;
+            --text-light: #1F2937;
+            --text-light-muted: #6B7280;
+            --border-light: #E5E7EB;
+            --bg-dark: #1F2937;
+            --bg-dark-alt: #111827;
+            --text-dark: #F9FAFB;
+            --text-dark-muted: #D1D5DB;
+            --border-dark: #374151;
+        }
+
+        body {
+            font-family: 'Lato', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-light);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body.dark-mode {
+            background-color: var(--bg-dark);
+            color: var(--text-dark);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--border-light);
+            padding-bottom: 20px;
+        }
+
+        body.dark-mode header {
+            border-bottom-color: var(--border-dark);
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 28px;
+            color: var(--primary);
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .theme-toggle:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background-color: var(--bg-light-alt);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 25px;
+            transition: box-shadow 0.3s;
+        }
+
+        body.dark-mode .card {
+            background-color: var(--bg-dark-alt);
+            border-color: var(--border-dark);
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        body.dark-mode .card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .card h2 {
+            font-family: 'Cinzel', serif;
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        body.dark-mode label {
+            color: var(--text-dark);
+        }
+
+        input[type="text"],
+        input[type="number"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            font-family: 'Lato', sans-serif;
+            font-size: 14px;
+            transition: border-color 0.3s, background-color 0.3s;
+        }
+
+        body.dark-mode input[type="text"],
+        body.dark-mode input[type="number"],
+        body.dark-mode textarea,
+        body.dark-mode select {
+            background-color: var(--bg-dark);
+            border-color: var(--border-dark);
+            color: var(--text-dark);
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #DB2777;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #059669;
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #DC2626;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .sections-container {
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        body.dark-mode .sections-container {
+            background-color: var(--bg-dark);
+            border-color: var(--border-dark);
+        }
+
+        .section-item {
+            background-color: var(--bg-light-alt);
+            border-left: 4px solid var(--primary);
+            padding: 12px;
+            margin-bottom: 12px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        body.dark-mode .section-item {
+            background-color: var(--bg-dark-alt);
+        }
+
+        .section-info {
+            flex: 1;
+        }
+
+        .section-name {
+            font-weight: 600;
+            color: var(--text-light);
+            margin-bottom: 6px;
+        }
+
+        body.dark-mode .section-name {
+            color: var(--text-dark);
+        }
+
+        .chords-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .chord-badge {
+            background-color: var(--primary);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .songs-list {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .song-item {
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        body.dark-mode .song-item {
+            background-color: var(--bg-dark);
+            border-color: var(--border-dark);
+        }
+
+        .song-item:hover {
+            border-color: var(--primary);
+            background-color: var(--bg-light-alt);
+        }
+
+        body.dark-mode .song-item:hover {
+            background-color: var(--bg-dark-alt);
+        }
+
+        .song-item.active {
+            border-color: var(--primary);
+            background-color: rgba(139, 92, 246, 0.05);
+        }
+
+        body.dark-mode .song-item.active {
+            background-color: rgba(139, 92, 246, 0.15);
+        }
+
+        .song-title {
+            font-weight: 700;
+            color: var(--text-light);
+            margin-bottom: 4px;
+        }
+
+        body.dark-mode .song-title {
+            color: var(--text-dark);
+        }
+
+        .song-artist {
+            font-size: 12px;
+            color: var(--text-light-muted);
+        }
+
+        body.dark-mode .song-artist {
+            color: var(--text-dark-muted);
+        }
+
+        .search-box {
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .search-box input {
+            padding-left: 35px;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light-muted);
+            pointer-events: none;
+        }
+
+        body.dark-mode .search-icon {
+            color: var(--text-dark-muted);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .button-group-inline {
+            display: flex;
+            gap: 10px;
+        }
+
+        .json-preview {
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            color: var(--text-light);
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        body.dark-mode .json-preview {
+            background-color: var(--bg-dark);
+            border-color: var(--border-dark);
+            color: var(--text-dark);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .input-group input {
+            flex: 1;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-box {
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        body.dark-mode .stat-box {
+            background-color: var(--bg-dark);
+            border-color: var(--border-dark);
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-light-muted);
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        body.dark-mode .stat-label {
+            color: var(--text-dark-muted);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-light-muted);
+        }
+
+        body.dark-mode .empty-state {
+            color: var(--text-dark-muted);
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: var(--primary);
+            opacity: 0.5;
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-success {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+
+        .alert-danger {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            border: 1px solid var(--danger);
+        }
+
+        .chord-input-group {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background-color: var(--bg-light);
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        body.dark-mode .modal-content {
+            background-color: var(--bg-dark);
+        }
+
+        .modal-close {
+            color: var(--text-light-muted);
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        body.dark-mode .modal-close {
+            color: var(--text-dark-muted);
+        }
+
+        .modal-close:hover {
+            color: var(--danger);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-music"></i> Gestor de Canciones</h1>
+            <div class="header-controls">
+                <button class="theme-toggle" onclick="toggleTheme()" title="Cambiar tema">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- Sección izquierda: Formulario -->
+            <div>
+                <div class="card">
+                    <h2><i class="fas fa-plus-circle"></i> Nueva Canción</h2>
+                    
+                    <div class="form-group">
+                        <label>Título *</label>
+                        <input type="text" id="title" placeholder="Ej: A Él sea la Gloria">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Artista *</label>
+                        <input type="text" id="artist" placeholder="Ej: Kabed">
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label>Tonalidad</label>
+                            <select id="key">
+                                <option value="">Seleccionar...</option>
+                                <option value="C">C</option>
+                                <option value="C#">C#</option>
+                                <option value="Db">Db</option>
+                                <option value="D">D</option>
+                                <option value="D#">D#</option>
+                                <option value="Eb">Eb</option>
+                                <option value="E">E</option>
+                                <option value="F">F</option>
+                                <option value="F#">F#</option>
+                                <option value="Gb">Gb</option>
+                                <option value="G">G</option>
+                                <option value="G#">G#</option>
+                                <option value="Ab">Ab</option>
+                                <option value="A">A</option>
+                                <option value="A#">A#</option>
+                                <option value="Bb">Bb</option>
+                                <option value="B">B</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>BPM</label>
+                            <input type="number" id="bpm" placeholder="100">
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label>Compás</label>
+                            <select id="timeSignature">
+                                <option value="">Seleccionar...</option>
+                                <option value="2/4">2/4</option>
+                                <option value="3/4">3/4</option>
+                                <option value="4/4">4/4</option>
+                                <option value="6/8">6/8</option>
+                                <option value="12/8">12/8</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>ID</label>
+                            <input type="number" id="songId" placeholder="Auto-generado" readonly>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>ID de YouTube</label>
+                        <input type="text" id="youtubeId" placeholder="Ej: jhsdjsdh">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Archivo de Audio</label>
+                        <input type="text" id="audioFile" placeholder="Ej: cancion.mp3">
+                    </div>
+
+                    <!-- Secciones -->
+                    <div class="form-group">
+                        <label><i class="fas fa-bars"></i> Secciones</label>
+                        <div class="sections-container" id="sectionsContainer"></div>
+                        
+                        <div class="input-group" style="margin-top: 12px;">
+                            <input type="text" id="sectionName" placeholder="Nombre de sección (Verso, Coro, etc)">
+                            <button class="btn btn-secondary btn-small" onclick="addSection()">
+                                <i class="fas fa-plus"></i> Agregar
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button class="btn btn-primary" onclick="saveSong()">
+                            <i class="fas fa-save"></i> Guardar Canción
+                        </button>
+                        <button class="btn btn-danger" onclick="resetForm()">
+                            <i class="fas fa-redo"></i> Limpiar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección derecha: Lista de Canciones -->
+            <div>
+                <div class="card">
+                    <h2><i class="fas fa-list"></i> Mis Canciones</h2>
+
+                    <div class="stats" id="stats"></div>
+
+                    <div class="search-box">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" id="searchInput" placeholder="Buscar por título o artista..." onkeyup="filterSongs()">
+                    </div>
+
+                    <div id="alertContainer"></div>
+
+                    <div class="songs-list" id="songsList"></div>
+
+                    <div class="button-group" style="margin-top: 20px;">
+                        <button class="btn btn-success" onclick="exportJSON()">
+                            <i class="fas fa-download"></i> Descargar JSON
+                        </button>
+                        <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">
+                            <i class="fas fa-upload"></i> Importar JSON
+                        </button>
+                        <button class="btn btn-danger" onclick="clearAll()">
+                            <i class="fas fa-trash"></i> Borrar Todo
+                        </button>
+                    </div>
+
+                    <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importJSON(event)">
+                </div>
+
+                <!-- Vista previa JSON -->
+                <div class="card" style="margin-top: 20px;">
+                    <h2><i class="fas fa-code"></i> Vista Previa JSON</h2>
+                    <div class="json-preview" id="jsonPreview">
+                        <p style="color: var(--text-light-muted); text-align: center;">Los datos aparecerán aquí</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let songs = [];
+        let currentSongId = null;
+        let sections = [];
+
+        // Cargar datos del localStorage al iniciar
+        window.addEventListener('DOMContentLoaded', () => {
+            loadSongs();
+            updateStats();
+            renderSongsList();
+            checkTheme();
+        });
+
+        // Tema oscuro/claro
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+        }
+
+        function checkTheme() {
+            const theme = localStorage.getItem('theme') || 'light';
+            if (theme === 'dark') {
+                document.body.classList.add('dark-mode');
+            }
+        }
+
+        // Cargar canciones
+        function loadSongs() {
+            const saved = localStorage.getItem('songs');
+            songs = saved ? JSON.parse(saved) : [];
+        }
+
+        // Guardar canciones
+        function saveSongsToStorage() {
+            localStorage.setItem('songs', JSON.stringify(songs));
+            updateStats();
+            renderSongsList();
+        }
+
+        // Agregar sección
+        function addSection() {
+            const sectionName = document.getElementById('sectionName').value.trim();
+            if (!sectionName) {
+                showAlert('Por favor ingresa un nombre para la sección', 'danger');
+                return;
+            }
+
+            sections.push({
+                name: sectionName,
+                chords: []
+            });
+
+            document.getElementById('sectionName').value = '';
+            renderSections();
+        }
+
+        // Eliminar sección
+        function removeSection(index) {
+            sections.splice(index, 1);
+            renderSections();
+        }
+
+        // Agregar acorde a una sección
+        function addChordToSection(sectionIndex) {
+            const input = document.getElementById(`chord-input-${sectionIndex}`);
+            const chord = input.value.trim().toUpperCase();
+
+            if (!chord) {
+                showAlert('Por favor ingresa un acorde', 'danger');
+                return;
+            }
+
+            sections[sectionIndex].chords.push(chord);
+            input.value = '';
+            renderSections();
+        }
+
+        // Eliminar acorde
+        function removeChord(sectionIndex, chordIndex) {
+            sections[sectionIndex].chords.splice(chordIndex, 1);
+            renderSections();
+        }
+
+        // Renderizar secciones
+        function renderSections() {
+            const container = document.getElementById('sectionsContainer');
+            
+            if (sections.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-light-muted); text-align: center;">No hay secciones agregadas</p>';
+                return;
+            }
+
+            container.innerHTML = sections.map((section, idx) => `
+                <div class="section-item">
+                    <div class="section-info">
+                        <div class="section-name">${section.name}</div>
+                        <div class="chords-list">
+                            ${section.chords.map((chord, chordIdx) => `
+                                <span class="chord-badge">
+                                    ${chord}
+                                    <button class="btn-close" style="background: none; border: none; color: white; cursor: pointer; margin-left: 6px; font-size: 12px;" onclick="removeChord(${idx}, ${chordIdx})">×</button>
+                                </span>
+                            `).join('')}
+                        </div>
+                        <div class="chord-input-group">
+                            <input type="text" id="chord-input-${idx}" placeholder="Agregar acorde (Ej: Bb, Eb, F)" style="margin-top: 8px;">
+                            <button class="btn btn-secondary btn-small" onclick="addChordToSection(${idx})" style="margin-top: 8px;">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <button class="btn btn-danger btn-small" onclick="removeSection(${idx})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // Guardar canción
+        function saveSong() {
+            const title = document.getElementById('title').value.trim();
+            const artist = document.getElementById('artist').value.trim();
+            const key = document.getElementById('key').value;
+            const bpm = document.getElementById('bpm').value;
+            const timeSignature = document.getElementById('timeSignature').value;
+            const youtubeId = document.getElementById('youtubeId').value;
+            const audioFile = document.getElementById('audioFile').value;
+            const songId = document.getElementById('songId').value;
+
+            if (!title || !artist || sections.length === 0) {
+                showAlert('Por favor completa todos los campos obligatorios y agrega al menos una sección', 'danger');
+                return;
+            }
+
+            const song = {
+                id: currentSongId || parseInt(songId) || Date.now(),
+                title,
+                artist,
+                key,
+                bpm,
+                timeSignature,
+                youtubeId,
+                audioFile,
+                sections: JSON.parse(JSON.stringify(sections))
+            };
+
+            if (currentSongId) {
+                const index = songs.findIndex(s => s.id === currentSongId);
+                songs[index] = song;
+                showAlert('Canción actualizada correctamente', 'success');
+                currentSongId = null;
+            } else {
+                songs.push(song);
+                showAlert('Canción guardada correctamente', 'success');
+            }
+
+            saveSongsToStorage();
+            resetForm();
+            updateJsonPreview();
+        }
+
+        // Editar canción
+        function editSong(id) {
+            const song = songs.find(s => s.id === id);
+            if (!song) return;
+
+            document.getElementById('title').value = song.title;
+            document.getElementById('artist').value = song.artist;
+            document.getElementById('key').value = song.key || '';
+            document.getElementById('bpm').value = song.bpm || '';
+            document.getElementById('timeSignature').value = song.timeSignature || '';
+            document.getElementById('youtubeId').value = song.youtubeId || '';
+            document.getElementById('audioFile').value = song.audioFile || '';
+            document.getElementById('songId').value = song.id;
+
+            sections = JSON.parse(JSON.stringify(song.sections || []));
+            renderSections();
+
+            currentSongId = id;
+            document.querySelector('.card').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Eliminar canción
+        function deleteSong(id) {
+            if (confirm('¿Estás seguro de que deseas eliminar esta canción?')) {
+                songs = songs.filter(s => s.id !== id);
+                saveSongsToStorage();
+                resetForm();
+                updateJsonPreview();
+                showAlert('Canción eliminada', 'success');
+            }
+        }
+
+        // Renderizar lista de canciones
+        function renderSongsList() {
+            const list = document.getElementById('songsList');
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            const filtered = songs.filter(song => 
+                song.title.toLowerCase().includes(searchTerm) ||
+                song.artist.toLowerCase().includes(searchTerm)
+            );
+
+            if (filtered.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <p>${songs.length === 0 ? 'No hay canciones aún' : 'No se encontraron resultados'}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            list.innerHTML = filtered.map(song => `
+                <div class="song-item ${currentSongId === song.id ? 'active' : ''}" onclick="editSong(${song.id})">
+                    <div class="song-title">${song.title}</div>
+                    <div class="song-artist">
+                        <i class="fas fa-user"></i> ${song.artist} 
+                        ${song.key ? `<span style="margin-left: 10px;"><i class="fas fa-music"></i> ${song.key}</span>` : ''}
+                        ${song.bpm ? `<span style="margin-left: 10px;"><i class="fas fa-tachometer-alt"></i> ${song.bpm} BPM</span>` : ''}
+                    </div>
+                    <div style="margin-top: 8px; font-size: 11px; color: var(--text-light-muted);">
+                        <i class="fas fa-layer-group"></i> ${song.sections.length} secciones
+                    </div>
+                    <div style="display: flex; gap: 8px; margin-top: 10px;">
+                        <button class="btn btn-danger btn-small" onclick="event.stopPropagation(); deleteSong(${song.id})">
+                            <i class="fas fa-trash"></i> Eliminar
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Filtrar canciones
+        function filterSongs() {
+            renderSongsList();
+        }
+
+        // Actualizar estadísticas
+        function updateStats() {
+            const stats = document.getElementById('stats');
+            const totalSongs = songs.length;
+            const totalSections = songs.reduce((sum, song) => sum + song.sections.length, 0);
+            const totalChords = songs.reduce((sum, song) => 
+                sum + song.sections.reduce((sSum, section) => sSum + section.chords.length, 0), 0
+            );
+
+            stats.innerHTML = `
+                <div class="stat-box">
+                    <div class="stat-number">${totalSongs}</div>
+                    <div class="stat-label">Canciones</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">${totalSections}</div>
+                    <div class="stat-label">Secciones</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">${totalChords}</div>
+                    <div class="stat-label">Acordes</div>
+                </div>
+            `;
+        }
+
+        // Limpiar formulario
+        function resetForm() {
+            document.getElementById('title').value = '';
+            document.getElementById('artist').value = '';
+            document.getElementById('key').value = '';
+            document.getElementById('bpm').value = '';
+            document.getElementById('timeSignature').value = '';
+            document.getElementById('youtubeId').value = '';
+            document.getElementById('audioFile').value = '';
+            document.getElementById('sectionName').value = '';
+            document.getElementById('songId').value = '';
+            sections = [];
+            currentSongId = null;
+            renderSections();
+            renderSongsList();
+        }
+
+        // Exportar JSON
+        function exportJSON() {
+            if (songs.length === 0) {
+                showAlert('No hay canciones para descargar', 'danger');
+                return;
+            }
+
+            const dataStr = JSON.stringify(songs, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `canciones-${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+            showAlert('JSON descargado correctamente', 'success');
+        }
+
+        // Importar JSON
+        function importJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (Array.isArray(imported)) {
+                        songs = [...songs, ...imported];
+                        saveSongsToStorage();
+                        showAlert(`${imported.length} canción(es) importada(s) correctamente`, 'success');
+                        updateJsonPreview();
+                    } else {
+                        showAlert('El archivo JSON debe contener un array de canciones', 'danger');
+                    }
+                } catch (error) {
+                    showAlert('Error al importar JSON: ' + error.message, 'danger');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        // Mostrar alertas
+        function showAlert(message, type = 'success') {
+            const container = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                <span>${message}</span>
+            `;
+            container.appendChild(alert);
+
+            setTimeout(() => {
+                alert.remove();
+            }, 3000);
+        }
+
+        // Actualizar vista previa JSON
+        function updateJsonPreview() {
+            const preview = document.getElementById('jsonPreview');
+            if (songs.length === 0) {
+                preview.innerHTML = '<p style="color: var(--text-light-muted); text-align: center;">Los datos aparecerán aquí</p>';
+                return;
+            }
+
+            preview.textContent = JSON.stringify(songs, null, 2);
+        }
+
+        // Borrar todo
+        function clearAll() {
+            if (confirm('¿Estás seguro de que deseas eliminar TODAS las canciones? Esta acción no se puede deshacer.')) {
+                songs = [];
+                saveSongsToStorage();
+                resetForm();
+                updateJsonPreview();
+                showAlert('Todas las canciones han sido eliminadas', 'success');
+            }
+        }
+
+        // Inicializar
+        renderSections();
+        updateJsonPreview();
+    </script>
+</body>
+</html>
