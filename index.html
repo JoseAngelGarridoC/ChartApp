@@ -573,6 +573,17 @@
     </button>
   </div>
 
+  <!-- Toggle de tema: debajo del botón hamburguesa -->
+  <div class="sidebar-footer" style="border-top: none; padding: 12px 18px; justify-content: center;">
+    <span class="footer-label" id="theme-label">Modo oscuro</span>
+    <div class="toggle-track" onclick="toggleTheme()" title="Cambiar tema" role="button" tabindex="0"
+         onkeydown="if(event.key==='Enter'||event.key===' ')toggleTheme()">
+      <div class="toggle-thumb" id="toggle-thumb">
+        <span id="theme-icon">🌙</span>
+      </div>
+    </div>
+  </div>
+
   <!-- Buscador -->
   <div class="search-wrap">
     <input
@@ -586,17 +597,6 @@
 
   <!-- Lista -->
   <div id="song-list"></div>
-
-  <!-- Footer: toggle de tema -->
-  <div class="sidebar-footer">
-    <span class="footer-label" id="theme-label">Modo oscuro</span>
-    <div class="toggle-track" onclick="toggleTheme()" title="Cambiar tema" role="button" tabindex="0"
-         onkeydown="if(event.key==='Enter'||event.key===' ')toggleTheme()">
-      <div class="toggle-thumb" id="toggle-thumb">
-        <span id="theme-icon">🌙</span>
-      </div>
-    </div>
-  </div>
 
 </aside>
 
